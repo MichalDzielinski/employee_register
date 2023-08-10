@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .forms import EmployeeForm
 
 def employee_list(request):
 
@@ -6,8 +7,8 @@ def employee_list(request):
     return render(request, 'emp_reg/employee_list.html', context)
 
 def employee_form(request):
-
-    context = {}
+    form = EmployeeForm()
+    context = {'form': form}
     return render(request, 'emp_reg/employee_form.html', context)
 
 def employee_delete(request):
