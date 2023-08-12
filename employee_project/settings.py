@@ -1,6 +1,7 @@
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import dj_database_url
 
 #region DEPLOYMENT SETTINGS
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
 
     #third party apps
     'crispy_forms',
+    'storages',
 
     #custom apps
     'emp_reg',
@@ -58,15 +60,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'employee_project.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.environ.get('DB_NAME'), 
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD') 
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME'), 
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD')
-        
+    'default': dj_database_url.parse(os.environ.get('DB_URL'))
     }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -90,6 +95,28 @@ USE_I18N = True
 USE_TZ = True
 #endregion LANGUAGE AND TIME
 
-
-STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#region AWS SETTINGS
+AWS_ACCESS_KEY_ID=os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY=os.environ.get('AWS_SECRET_ACCESS_KEY') 
+AWS_STORAGE_BUCKET_NAME='bucketsforeva'
+AWS_S3_CUSTOM_DOMAIN=f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+AWS_DEFAULT_ACL='public-read'
+ASW_S3_OBJECTS_PARAMETERS={
+    'CacheControl': 'max-age=86400'
+}
+AWS_LOCATION='static'
+AWS_QUERYSTRING_AUTH=False
+
+AWS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+}
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+
+#endregion AWS SETTINGS
